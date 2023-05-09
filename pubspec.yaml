@@ -1,0 +1,20 @@
+name: htlc_watchtower
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+isar_version: &isar_version 3.1.0
+
+dependencies:
+  hex: ^0.2.0
+  settings_yaml: ^3.4.0
+  logging: ^1.0.2
+  isar: &isar_version
+  znn_sdk_dart:
+    git:
+      url: https://github.com/vilkris4/znn_sdk_dart.git
+      ref: spork_htlc
+
+dev_dependencies:
+  isar_generator: &isar_version
+  build_runner: ^2.1.0
