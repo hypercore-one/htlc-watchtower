@@ -21,3 +21,4 @@ database/
 !src/models/database
 
 *isar.dll
+*.g.dart
