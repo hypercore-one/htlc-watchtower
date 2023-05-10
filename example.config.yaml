@@ -1,1 +1,2 @@
 node_url_ws: 'ws://127.0.0.1:35998'
+unlock_threshold_in_minutes: 60

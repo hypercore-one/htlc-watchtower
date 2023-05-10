@@ -117,7 +117,7 @@ class Indexer {
   Future<void> _addPreimageToHtlcDatas(String id, String preimage) async {
     final hashlock = await _dbService!.getHashlockForHtlcId(id);
     if (hashlock != null) {
-      final htlcDatas = await _dbService!.getHtlcDatasForHashlock(hashlock);
+      final htlcDatas = await _dbService!.getHtlcDatasByHashlock(hashlock);
       for (var i = 0; i < htlcDatas.length; i += 1) {
         htlcDatas[i].preimage = preimage;
       }

@@ -75,10 +75,13 @@ Future<void> _waitForPlasma(Zenon zenon) async {
 
 Future<void> _run(Zenon zenon) async {
   _log.info('Running watchtower');
+  final startTime = Utils.unixTimeNow;
   await Indexer.getInstance().deleteExpiredHtlcDatas();
   await Indexer.getInstance().syncHtlcBlocks(zenon);
   await ProxyUnlockHandler.getInstance().run(zenon);
-  Future.delayed(const Duration(minutes: 5), () async {
-    _run(zenon);
-  });
+  final elapsed = Duration(seconds: Utils.unixTimeNow - startTime);
+  final delay = elapsed < Duration(minutes: 5)
+      ? Duration(minutes: 5) - elapsed
+      : Duration.zero;
+  Future.delayed(delay, () => _run(zenon));
 }

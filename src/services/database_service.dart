@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:isar/isar.dart';
 
+import '../config/config.dart';
 import '../models/database/htlc_data.dart';
 import '../utils/constants.dart';
 import '../utils/utils.dart';
@@ -38,12 +39,19 @@ class DatabaseService {
         ?.hashlock;
   }
 
-  Future<List<HtlcData>> getHtlcDatasForHashlock(String hashlock) async {
+  Future<List<HtlcData>> getHtlcDatasByHashlock(String hashlock) async {
     return await isar!.htlcDatas.filter().hashlockEqualTo(hashlock).findAll();
   }
 
-  Future<List<HtlcData>> getHtlcDatasWithPreimage() async {
-    return await isar!.htlcDatas.filter().preimageIsNotNull().findAll();
+  Future<List<HtlcData>> getHtlcDatasToUnlock() async {
+    final thresholdTime = Utils.unixTimeNow +
+        Duration(minutes: Config.unlockThresholdInMinutes).inSeconds;
+    return await isar!.htlcDatas
+        .filter()
+        .preimageIsNotNull()
+        .and()
+        .expirationTimeLessThan(thresholdTime)
+        .findAll();
   }
 
   Future<void> deleteHtlcData(String htlcId) async {

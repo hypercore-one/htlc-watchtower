@@ -23,8 +23,8 @@ class ProxyUnlockHandler {
 
   Future<void> run(Zenon zenon) async {
     try {
-      final htlcsWithPreimage = await _dbService!.getHtlcDatasWithPreimage();
-      for (final data in htlcsWithPreimage) {
+      final htlcDatasToUnlock = await _dbService!.getHtlcDatasToUnlock();
+      for (final data in htlcDatasToUnlock) {
         if (await _canProxyUnlock(zenon, data.recipient, data.id)) {
           await _unlockHtlc(zenon, data).then((_) async {
             _log.info('Unlocked HTLC with ID ${data.id}');
