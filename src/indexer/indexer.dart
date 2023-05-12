@@ -95,9 +95,6 @@ class Indexer {
         case 'Unlock':
           if (block.descendantBlocks.isNotEmpty) {
             unlockedHtlcs.add(data);
-          } else {
-            _log.severe('Unlock block not accepted by HTLC contract. '
-                'Block hash: ${block.hash.toString()}');
           }
           break;
       }
