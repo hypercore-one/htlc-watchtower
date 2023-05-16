@@ -1,0 +1,14 @@
+version: '3.8'
+
+volumes:
+  wallet: {}
+
+services:
+  watchtower:
+    build: .
+    container_name: watchtower
+    
+    volumes:
+      - wallet:/root/.znn/wallet
+
+    restart: unless-stopped
