@@ -1,6 +1,6 @@
 # htlc-watchtower
 
-Instructions to build a docker image and run it is a container
+Instructions to build a docker image and run it as a container
 
 Clone the repo and move into that folder
 
