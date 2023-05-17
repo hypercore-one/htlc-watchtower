@@ -48,6 +48,12 @@ sudo systemctl enable htlc-watchtower
 sudo systemctl start htlc-watchtower
 ```
 
+Once the service is running check the status and note the ZTS address that requires fused QSR. Fuse 120 QSR to that address.  Once fused the service will start working as expected.
+
+```
+ systemctl status htlc-watchtower
+```
+
 ## Instructions to build a docker image and run it as a container
 
 Clone the repo and move into that folder
