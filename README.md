@@ -17,7 +17,7 @@ cp example.config.json build/config.json
 ```
 sudo nano /etc/systemd/system/htlc-watchtower.service
 ```
-Paste the following content into the terminal
+Paste the following content into the terminal.  Make sure the `ExecStart=` path is correct. 
 
 ```
 [Unit]
