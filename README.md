@@ -62,7 +62,7 @@ Create a `config` file from the template
 cp example.config.yaml config.yaml
 ```
 
-Ensure the url of the ZNN node in the `config.yaml` is accurate.  Can the following URL if necessary.
+Ensure the url of the ZNN node in the `config.yaml` is accurate.  Change the following URL if necessary.
 ```
 node_url_ws: 'ws://127.0.0.1:35998'
 ```
