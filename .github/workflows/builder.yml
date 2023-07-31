@@ -26,8 +26,8 @@ jobs:
         
       - name: Compile
         run: |
-          mkdir build
-          dart compile src/main.dart exe -o build/htlc-watchtower
+            mkdir build
+            dart compile exe src/main.dart -o build/htlc-watchtower
           
       - name: Add execute flag
         run: |
