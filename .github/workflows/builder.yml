@@ -36,11 +36,16 @@ jobs:
         run: |
           chmod +x build/*
           
+      - name: Copy config file
+        run: |
+            cp example.config.yaml build/example.config.yaml
+          
       - name: Archive files
         run: |
           cd build
-          zip htlc-watchtower-linux-amd64.zip htlc-watchtower
+          zip htlc-watchtower-linux-amd64.zip htlc-watchtower example.config.yaml
           rm htlc-watchtower
+          rm example.config.yaml
           
       - name: Generate checksums
         run: |
@@ -50,7 +55,7 @@ jobs:
           
       - name: Set version
         run: |
-          echo "WATCHTOWER_VERSION=${{ github.ref }}" >> $GITHUB_ENV
+          echo "WATCHTOWER_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.5.0
@@ -58,6 +63,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/*
           release_name: ${{ env.WATCHTOWER_VERSION }}
+          prerelease: ${{ contains(env.WATCHTOWER_VERSION, '-') }}
           tag: ${{ env.WATCHTOWER_VERSION }}
           file_glob: true
           overwrite: true
