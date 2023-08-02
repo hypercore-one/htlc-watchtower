@@ -23,7 +23,8 @@ class ProxyUnlockHandler {
 
   Future<void> run(Zenon zenon) async {
     try {
-      final htlcDatasToUnlock = await _dbService!.getHtlcDatasToUnlock();
+      final htlcDatasToUnlock =
+          _prioritizeHtlcsToUnlock(await _dbService!.getHtlcDatasToUnlock());
       for (final data in htlcDatasToUnlock) {
         if (await _canProxyUnlock(zenon, data.recipient, data.id)) {
           await _unlockHtlc(zenon, data).then((_) async {
@@ -75,5 +76,50 @@ class ProxyUnlockHandler {
     }
 
     return true;
+  }
+
+  List<HtlcData> _prioritizeHtlcsToUnlock(List<HtlcData> htlcDatas) {
+    const maxHtlcsToUnlock = 50;
+
+    if (htlcDatas.length <= maxHtlcsToUnlock) {
+      return htlcDatas;
+    }
+
+    _log.info('Max HTLCs to unlock exceeded: ${htlcDatas.length}');
+
+    htlcDatas.removeWhere((e) {
+      if (e.tokenStandard == znnTokenStandard &&
+          e.amount < BigInt.from(1 * oneZnn)) {
+        return true;
+      }
+      if (e.tokenStandard == qsrTokenStandard &&
+          e.amount < BigInt.from(1 * oneQsr)) {
+        return true;
+      }
+      return false;
+    });
+
+    _log.info(
+        'HTLCs to unlock after removing small amounts: ${htlcDatas.length}');
+
+    if (htlcDatas.length <= maxHtlcsToUnlock) {
+      return htlcDatas;
+    }
+
+    htlcDatas.removeWhere(
+        (e) => ![znnTokenStandard, qsrTokenStandard].contains(e.tokenStandard));
+
+    _log.info(
+        'HTLCs to unlock after removing non ZNN & QSR tokens: ${htlcDatas.length}');
+
+    if (htlcDatas.length <= maxHtlcsToUnlock) {
+      return htlcDatas;
+    }
+
+    htlcDatas.sort((a, b) => b.amount.compareTo(a.amount));
+
+    _log.info('HTLCs to unlock prioritized by amount.');
+
+    return htlcDatas.take(maxHtlcsToUnlock).toList();
   }
 }

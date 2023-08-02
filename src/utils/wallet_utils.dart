@@ -4,7 +4,6 @@ import 'package:logging/logging.dart';
 import 'package:znn_sdk_dart/znn_sdk_dart.dart';
 
 import 'constants.dart';
-import 'extensions.dart';
 
 class WalletUtils {
   static Future<KeyPair> initializeWallet() async {
@@ -26,6 +25,6 @@ class WalletUtils {
   static Future<bool> hasEnoughPlasma(Zenon zenon) async {
     final address = await zenon.defaultKeyPair!.address;
     return (await zenon.embedded.plasma.get(address!)).qsrAmount >=
-        minimumFusedQsrForWallet.extractDecimals(qsrDecimals);
+        AmountUtils.extractDecimals(minimumFusedQsrForWallet, coinDecimals);
   }
 }

@@ -7,12 +7,14 @@ part 'htlc_data.g.dart';
 @collection
 class HtlcData {
   final String id;
-  Id get isarId => Utils.htlcIdToDatabaseId(id);
   final String hashlock;
   final String sender;
   final String recipient;
   final int creationTime;
   final int expirationTime;
+  final String amountString;
+  final String tokenStandard;
+
   String? preimage;
 
   HtlcData({
@@ -22,6 +24,13 @@ class HtlcData {
     required this.recipient,
     required this.creationTime,
     required this.expirationTime,
+    required this.amountString,
+    required this.tokenStandard,
     this.preimage,
   });
+
+  Id get isarId => Utils.htlcIdToDatabaseId(id);
+
+  @Ignore()
+  BigInt get amount => BigInt.parse(amountString);
 }
