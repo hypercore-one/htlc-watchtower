@@ -12,9 +12,9 @@ dependencies:
   isar: &isar_version
   znn_sdk_dart:
     git:
-      url: https://github.com/vilkris4/znn_sdk_dart.git
-      ref: spork_htlc
+      url: https://github.com/hypercore-one/znn_sdk_dart.git
+      ref: feature/bigint
 
 dev_dependencies:
   isar_generator: &isar_version
-  build_runner: ^2.1.0
+  build_runner: ^2.3.3

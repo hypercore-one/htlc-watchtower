@@ -64,6 +64,7 @@ class Indexer {
   Future<void> _processBlocks(List<AccountBlock> blocks) async {
     final List<HtlcData> createdHtlcs = [];
     final List<DecodedBlockData> unlockedHtlcs = [];
+
     for (final block in blocks) {
       if (block.blockType != BlockTypeEnum.contractReceive.index) {
         continue;
@@ -80,8 +81,8 @@ class Indexer {
       }
       switch (data.function) {
         case 'Create':
-          final expirationTime = data.params['expirationTime'].toInt();
-          if (expirationTime <= Utils.unixTimeNow) {
+          if (!(await _shouldMonitorHtlc(pairedBlock.address.toString(), data,
+              createdHtlcs, block.height))) {
             break;
           }
           createdHtlcs.add(HtlcData(
@@ -90,7 +91,9 @@ class Indexer {
               sender: pairedBlock.address.toString(),
               recipient: data.params['hashLocked'].toString(),
               creationTime: block.confirmationDetail!.momentumTimestamp,
-              expirationTime: expirationTime));
+              expirationTime: data.params['expirationTime'].toInt(),
+              amountString: pairedBlock.amount.toString(),
+              tokenStandard: pairedBlock.tokenStandard.toString()));
           break;
         case 'Unlock':
           if (block.descendantBlocks.isNotEmpty) {
@@ -136,5 +139,53 @@ class Indexer {
     return cache.existsSync()
         ? json.decode(cache.readAsStringSync())['last_checked_height']
         : 0;
+  }
+
+  Future<bool> _shouldMonitorHtlc(String sender, DecodedBlockData data,
+      List<HtlcData> newHtlcs, int blockHeight) async {
+    final expirationTime = data.params['expirationTime'].toInt();
+    final recipient = data.params['hashLocked'].toString();
+    final hashlock = Hash.fromBytes(data.params['hashLock']).toString();
+
+    // Don't monitor expired HTLCs.
+    if (expirationTime <= Utils.unixTimeNow) {
+      return false;
+    }
+
+    // Don't monitor HTLCs that expire after $maxHtlcExpirationInHours.
+    // Wallets should disallow P2P swaps with HTLCs that exceed
+    // $maxHtlcExpirationInHours.
+    if (expirationTime - Utils.unixTimeNow >
+        maxHtlcExpirationInHours * 60 * 60) {
+      _log.info('''Encountered HTLC with expiration time ($expirationTime) 
+          exceeding the max allowed expiration time. 
+          The HTLC will not be monitored. Block height: $blockHeight''');
+      return false;
+    }
+
+    // Don't monitor the HTLC if an HTLC that is not a counter HTLC is created
+    // with an existing hashlock. This should not happen with P2P swaps and
+    // wallets should check that the initial HTLC's hashlock has not been used
+    // in the past $maxHtlcExpirationInHours to ensure the watchtower is
+    // monitoring the HTLC.
+    final htlcsWithSameHashlock =
+        await _dbService!.getHtlcDatasByHashlock(hashlock);
+    htlcsWithSameHashlock.addAll(newHtlcs.where((e) => e.hashlock == hashlock));
+
+    if (htlcsWithSameHashlock.isEmpty) {
+      return true;
+    }
+
+    // Check for a counter HTLC
+    if (htlcsWithSameHashlock
+            .where((e) => e.sender == recipient && e.recipient == sender)
+            .length ==
+        1) {
+      return true;
+    }
+
+    _log.info('''Encountered HTLC with non-unique hashlock ($hashlock). 
+          The HTLC will not be monitored. Block height: $blockHeight''');
+    return false;
   }
 }
