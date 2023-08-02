@@ -50,7 +50,7 @@ jobs:
           
       - name: Set version
         run: |
-          echo "WATCHTOWER_VERSION=0.0.1" >> $GITHUB_ENV
+          echo "WATCHTOWER_VERSION=${{ github.ref }}" >> $GITHUB_ENV
           
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.5.0
