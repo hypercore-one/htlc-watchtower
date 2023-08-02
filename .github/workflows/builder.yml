@@ -24,10 +24,13 @@ jobs:
       - name: Install dependencies
         run: dart pub get
         
+      - name: Run build runner
+        run: dart run build_runner build
+        
       - name: Compile
         run: |
-          mkdir build
-          dart compile src/main.dart exe -o build/htlc-watchtower
+            mkdir build
+            dart compile exe src/main.dart -o build/htlc-watchtower
           
       - name: Add execute flag
         run: |
@@ -47,7 +50,7 @@ jobs:
           
       - name: Set version
         run: |
-          echo "WATCHTOWER_VERSION=0.0.1" >> $GITHUB_ENV
+          echo "WATCHTOWER_VERSION=${{ github.ref }}" >> $GITHUB_ENV
           
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.5.0
