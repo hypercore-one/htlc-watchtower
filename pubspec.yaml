@@ -1,7 +1,7 @@
 name: htlc_watchtower
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0"
 
 isar_version: &isar_version 3.1.0
 
@@ -13,7 +13,7 @@ dependencies:
   znn_sdk_dart:
     git:
       url: https://github.com/hypercore-one/znn_sdk_dart.git
-      ref: feature/bigint
+      ref: 20c70bc9d60e07f4f0f7c506ac840a09b34378ba
 
 dev_dependencies:
   isar_generator: &isar_version

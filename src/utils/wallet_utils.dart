@@ -25,6 +25,7 @@ class WalletUtils {
   static Future<bool> hasEnoughPlasma(Zenon zenon) async {
     final address = await zenon.defaultKeyPair!.address;
     return (await zenon.embedded.plasma.get(address!)).qsrAmount >=
-        AmountUtils.extractDecimals(minimumFusedQsrForWallet, coinDecimals);
+        AmountUtils.extractDecimals(
+            minimumFusedQsrForWallet.toString(), coinDecimals);
   }
 }
