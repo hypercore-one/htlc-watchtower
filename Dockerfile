@@ -9,6 +9,7 @@ RUN wget https://github.com/isar/isar/releases/download/3.1.0%2B1/libisar_linux_
 
 # Copy app source code and AOT compile it.
 COPY . .
+RUN mkdir build
 RUN cp libisar_linux_x64.so build/libisar.so
 
 # Ensure packages are still up-to-date if anything has changed
